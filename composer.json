@@ -19,7 +19,7 @@
     "tourze/enum-extra": "~0.0.5",
     "tourze/json-rpc-core": "^0.0.6",
     "tourze/easy-admin-attribute": "0.1.*",
-    "tourze/doctrine-track-bundle": "0.0.*",
+    "tourze/doctrine-track-bundle": "0.1.*",
     "tourze/doctrine-indexed-bundle": "0.0.*",
     "tourze/wechat-official-account-bundle": "0.0.*",
     "tourze/symfony-cron-job-bundle": "0.1.*",
