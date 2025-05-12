@@ -2,8 +2,6 @@
 
 namespace WechatOfficialAccountMassBundle\Entity;
 
-use AntdCpBundle\Builder\Action\ModalFormAction;
-use AntdCpBundle\Builder\Field\InputTextField;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Tourze\DoctrineIndexedBundle\Attribute\IndexColumn;
@@ -14,7 +12,6 @@ use Tourze\DoctrineTrackBundle\Attribute\TrackColumn;
 use Tourze\EasyAdmin\Attribute\Action\Creatable;
 use Tourze\EasyAdmin\Attribute\Action\Deletable;
 use Tourze\EasyAdmin\Attribute\Action\Editable;
-use Tourze\EasyAdmin\Attribute\Action\ListAction;
 use Tourze\EasyAdmin\Attribute\Column\BoolColumn;
 use Tourze\EasyAdmin\Attribute\Column\ExportColumn;
 use Tourze\EasyAdmin\Attribute\Column\ListColumn;
@@ -22,9 +19,7 @@ use Tourze\EasyAdmin\Attribute\Field\FormField;
 use Tourze\EasyAdmin\Attribute\Filter\Filterable;
 use Tourze\EasyAdmin\Attribute\Permission\AsPermission;
 use WechatOfficialAccountBundle\Entity\Account;
-use WechatOfficialAccountBundle\Service\OfficialAccountClient;
 use WechatOfficialAccountMassBundle\Enum\MassType;
-use WechatOfficialAccountMassBundle\Request\PreviewTaskRequest;
 
 #[AsPermission(title: '群发任务')]
 #[Creatable]
@@ -289,37 +284,5 @@ class MassTask
 
         // TODO 更多数据类型
         return [];
-    }
-
-    #[ListAction(title: '预览')]
-    public function renderPreviewAction(): ModalFormAction
-    {
-        return ModalFormAction::gen()
-            ->setFormTitle('预览')
-            ->setLabel('预览')
-            ->setFormFields([
-                InputTextField::gen()
-                    ->setId('openId')
-                    ->setLabel('OpenID')
-                    ->setInputProps([
-                        'style' => [
-                            'width' => '100%',
-                        ],
-                    ]),
-            ])
-            ->setCallback(function (
-                array $form,
-                array $record,
-                OfficialAccountClient $client,
-            ) {
-                $request = new PreviewTaskRequest();
-                $request->setToUser($form['openId']);
-                $request->setMessage($this->formatMessage());
-                $client->request($request);
-
-                return [
-                    '__message' => '操作成功，请在手机微信查看',
-                ];
-            });
     }
 }
