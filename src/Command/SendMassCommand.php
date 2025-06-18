@@ -21,6 +21,7 @@ use WechatOfficialAccountMassBundle\Request\SendToAllRequest;
 #[AsCommand(name: 'wechat:send-mass', description: '公众号群发')]
 class SendMassCommand extends Command
 {
+    public const NAME = 'wechat:send-mass';
     public function __construct(
         private readonly LoggerInterface $logger,
         private readonly MassTaskRepository $taskRepository,
