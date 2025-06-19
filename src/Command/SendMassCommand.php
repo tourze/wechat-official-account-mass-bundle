@@ -2,7 +2,7 @@
 
 namespace WechatOfficialAccountMassBundle\Command;
 
-use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -18,7 +18,7 @@ use WechatOfficialAccountMassBundle\Request\SendByTagRequest;
 use WechatOfficialAccountMassBundle\Request\SendToAllRequest;
 
 #[AsCronTask('* * * * *')]
-#[AsCommand(name: 'wechat:send-mass', description: '公众号群发')]
+#[AsCommand(name: self::NAME, description: '公众号群发')]
 class SendMassCommand extends Command
 {
     public const NAME = 'wechat:send-mass';
@@ -37,7 +37,7 @@ class SendMassCommand extends Command
         $models = $this->taskRepository->createQueryBuilder('a')
             ->where('a.sent = false AND a.valid = true')
             ->andWhere('a.sendTime <= :now')
-            ->setParameter('now', Carbon::now())
+            ->setParameter('now', CarbonImmutable::now())
             ->getQuery()
             ->getResult();
 
@@ -56,16 +56,16 @@ class SendMassCommand extends Command
 
             $request = null;
             // 有设置标签，就走标签逻辑
-            if ($task->getTagId()) {
+            if ($task->getTagId() !== null) {
                 $request = new SendByTagRequest();
                 $request->setTagId($task->getTagId());
             }
             // 有设置用户列表
-            if ($task->getOpenIds()) {
+            if (count($task->getOpenIds()) > 0) {
                 $request = new SendByOpenIdRequest();
                 $request->setToUsers($task->getOpenIds());
             }
-            if (!$request) {
+            if ($request === null) {
                 $request = new SendToAllRequest();
             }
 

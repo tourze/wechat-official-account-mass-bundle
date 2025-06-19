@@ -2,7 +2,7 @@
 
 namespace WechatOfficialAccountMassBundle\Tests\Command;
 
-use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
@@ -70,7 +70,7 @@ class SendMassCommandTest extends TestCase
         $queryBuilder->expects($this->once())
             ->method('setParameter')
             ->with('now', $this->callback(function ($now) {
-                return $now instanceof Carbon;
+                return $now instanceof CarbonImmutable;
             }))
             ->willReturn($queryBuilder);
             

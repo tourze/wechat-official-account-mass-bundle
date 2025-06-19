@@ -97,7 +97,7 @@ class MassTaskTest extends TestCase
 
     public function testSetSendTime_returnsCorrectValue_whenSet(): void
     {
-        $sendTime = new \DateTime('2023-01-01 12:00:00');
+        $sendTime = new \DateTimeImmutable('2023-01-01 12:00:00');
         $this->massTask->setSendTime($sendTime);
         $this->assertSame($sendTime, $this->massTask->getSendTime());
     }
@@ -185,7 +185,7 @@ class MassTaskTest extends TestCase
 
     public function testSetCreateTime_returnsCorrectValue_whenSet(): void
     {
-        $createTime = new \DateTime('2023-01-01 12:00:00');
+        $createTime = new \DateTimeImmutable('2023-01-01 12:00:00');
         $this->massTask->setCreateTime($createTime);
         $this->assertSame($createTime, $this->massTask->getCreateTime());
     }
@@ -198,7 +198,7 @@ class MassTaskTest extends TestCase
 
     public function testSetUpdateTime_returnsCorrectValue_whenSet(): void
     {
-        $updateTime = new \DateTime('2023-01-01 12:00:00');
+        $updateTime = new \DateTimeImmutable('2023-01-01 12:00:00');
         $this->massTask->setUpdateTime($updateTime);
         $this->assertSame($updateTime, $this->massTask->getUpdateTime());
     }
