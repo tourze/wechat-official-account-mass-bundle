@@ -5,7 +5,7 @@ namespace WechatOfficialAccountMassBundle\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Tourze\DoctrineIndexedBundle\Attribute\IndexColumn;
-use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
+use Tourze\DoctrineSnowflakeBundle\Traits\SnowflakeKeyAware;
 use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
 use Tourze\DoctrineTrackBundle\Attribute\TrackColumn;
 use WechatOfficialAccountBundle\Entity\Account;
@@ -16,11 +16,7 @@ use WechatOfficialAccountMassBundle\Enum\MassType;
 class MassTask implements \Stringable
 {
     use TimestampableAware;
-    #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
-    #[ORM\CustomIdGenerator(SnowflakeIdGenerator::class)]
-    #[ORM\Column(type: Types::BIGINT, nullable: false, options: ['comment' => 'ID'])]
-    private ?string $id = null;
+    use SnowflakeKeyAware;
 
     #[IndexColumn]
     #[TrackColumn]
@@ -61,11 +57,6 @@ class MassTask implements \Stringable
 
     #[ORM\Column(length: 60, nullable: true, options: ['comment' => '消息的数据ID'])]
     private ?string $msgDataId = null;
-
-    public function getId(): ?string
-    {
-        return $this->id;
-    }
 
     public function isValid(): ?bool
     {

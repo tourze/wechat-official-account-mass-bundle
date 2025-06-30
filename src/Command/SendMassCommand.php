@@ -17,7 +17,7 @@ use WechatOfficialAccountMassBundle\Request\SendByOpenIdRequest;
 use WechatOfficialAccountMassBundle\Request\SendByTagRequest;
 use WechatOfficialAccountMassBundle\Request\SendToAllRequest;
 
-#[AsCronTask('* * * * *')]
+#[AsCronTask(expression: '* * * * *')]
 #[AsCommand(name: self::NAME, description: '公众号群发')]
 class SendMassCommand extends Command
 {
