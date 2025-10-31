@@ -13,7 +13,8 @@ class SendByOpenIdRequest extends WithAccountRequest
 {
     use TaskTrait;
 
-    private array $toUsers;
+    /** @var array<string> */
+    private array $toUsers = [];
 
     public function getRequestPath(): string
     {
@@ -37,11 +38,17 @@ class SendByOpenIdRequest extends WithAccountRequest
         ];
     }
 
+    /**
+     * @return array<string>
+     */
     public function getToUsers(): array
     {
         return $this->toUsers;
     }
 
+    /**
+     * @param array<string> $toUsers
+     */
     public function setToUsers(array $toUsers): void
     {
         $this->toUsers = $toUsers;

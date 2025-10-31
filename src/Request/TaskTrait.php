@@ -12,7 +12,8 @@ trait TaskTrait
      */
     private bool $sendIgnoreReprint = true;
 
-    private array $message;
+    /** @var array<string, mixed> */
+    private array $message = [];
 
     /**
      * @var string|null 开发者侧群发msgid，长度限制64字节，如不填，则后台默认以群发范围和群发内容的摘要值做为clientmsgid
@@ -29,11 +30,17 @@ trait TaskTrait
         $this->sendIgnoreReprint = $sendIgnoreReprint;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getMessage(): array
     {
         return $this->message;
     }
 
+    /**
+     * @param array<string, mixed> $message
+     */
     public function setMessage(array $message): void
     {
         $this->message = $message;

@@ -1,3 +1,0 @@
-wechat_official_account_mass_controllers:
-  resource: '../../Controller/'
-  type: attribute

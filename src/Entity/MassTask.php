@@ -4,6 +4,7 @@ namespace WechatOfficialAccountMassBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 use Tourze\DoctrineIndexedBundle\Attribute\IndexColumn;
 use Tourze\DoctrineSnowflakeBundle\Traits\SnowflakeKeyAware;
 use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
@@ -20,6 +21,7 @@ class MassTask implements \Stringable
 
     #[IndexColumn]
     #[TrackColumn]
+    #[Assert\NotNull]
     #[ORM\Column(type: Types::BOOLEAN, nullable: true, options: ['comment' => '有效', 'default' => 0])]
     private ?bool $valid = false;
 
@@ -27,34 +29,50 @@ class MassTask implements \Stringable
     #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     private ?Account $account = null;
 
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 100)]
     #[ORM\Column(type: Types::STRING, length: 100, options: ['comment' => '任务名'])]
     private ?string $title = null;
 
     #[IndexColumn]
-    #[ORM\Column(type: Types::INTEGER, nullable: false, enumType: MassType::class, options: ['default' => 0, 'comment' => '消息类型'])]
+    #[Assert\NotNull]
+    #[Assert\Choice(callback: [MassType::class, 'cases'])]
+    #[ORM\Column(type: Types::STRING, length: 10, nullable: false, enumType: MassType::class, options: ['default' => '1', 'comment' => '消息类型'])]
     private ?MassType $type = null;
 
-    #[ORM\Column(type: Types::TEXT, length: 65535, nullable: true, options: ['default' => '', 'comment' => '回复内容'])]
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 65535)]
+    #[ORM\Column(type: Types::TEXT, length: 65535, nullable: false, options: ['default' => '', 'comment' => '回复内容'])]
     private string $content;
 
+    #[Assert\NotNull]
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, options: ['comment' => '发送时间'])]
     private ?\DateTimeImmutable $sendTime = null;
 
+    #[Assert\Length(max: 255)]
     #[ORM\Column(type: Types::BIGINT, nullable: true, options: ['comment' => '要发送的标签ID'])]
     private ?string $tagId = null;
 
+    /**
+     * @var string[]
+     */
+    #[Assert\Type(type: 'array')]
     #[ORM\Column(nullable: true, options: ['comment' => '要发送的OpenID列表'])]
     private array $openIds = [];
 
+    #[Assert\Type(type: 'bool')]
     #[ORM\Column(type: Types::BOOLEAN, nullable: true, options: ['comment' => '已发送'])]
     private ?bool $sent = null;
 
+    #[Assert\Length(max: 120)]
     #[ORM\Column(length: 120, nullable: true, options: ['comment' => '媒体ID'])]
     private ?string $mediaId = null;
 
+    #[Assert\Length(max: 60)]
     #[ORM\Column(length: 60, nullable: true, options: ['comment' => '任务ID'])]
     private ?string $msgTaskId = null;
 
+    #[Assert\Length(max: 60)]
     #[ORM\Column(length: 60, nullable: true, options: ['comment' => '消息的数据ID'])]
     private ?string $msgDataId = null;
 
@@ -63,11 +81,9 @@ class MassTask implements \Stringable
         return $this->valid;
     }
 
-    public function setValid(?bool $valid): self
+    public function setValid(?bool $valid): void
     {
         $this->valid = $valid;
-
-        return $this;
     }
 
     public function getAccount(): ?Account
@@ -75,11 +91,9 @@ class MassTask implements \Stringable
         return $this->account;
     }
 
-    public function setAccount(?Account $account): self
+    public function setAccount(?Account $account): void
     {
         $this->account = $account;
-
-        return $this;
     }
 
     public function getTitle(): ?string
@@ -87,11 +101,9 @@ class MassTask implements \Stringable
         return $this->title;
     }
 
-    public function setTitle(string $title): self
+    public function setTitle(string $title): void
     {
         $this->title = $title;
-
-        return $this;
     }
 
     public function getTagId(): ?string
@@ -99,23 +111,25 @@ class MassTask implements \Stringable
         return $this->tagId;
     }
 
-    public function setTagId(?string $tagId): self
+    public function setTagId(?string $tagId): void
     {
         $this->tagId = $tagId;
-
-        return $this;
     }
 
+    /**
+     * @return string[]
+     */
     public function getOpenIds(): array
     {
         return $this->openIds;
     }
 
-    public function setOpenIds(?array $openIds): self
+    /**
+     * @param string[] $openIds
+     */
+    public function setOpenIds(array $openIds): void
     {
         $this->openIds = $openIds;
-
-        return $this;
     }
 
     public function getSendTime(): ?\DateTimeImmutable
@@ -123,11 +137,9 @@ class MassTask implements \Stringable
         return $this->sendTime;
     }
 
-    public function setSendTime(\DateTimeImmutable $sendTime): self
+    public function setSendTime(?\DateTimeImmutable $sendTime): void
     {
         $this->sendTime = $sendTime;
-
-        return $this;
     }
 
     public function getType(): ?MassType
@@ -155,11 +167,9 @@ class MassTask implements \Stringable
         return $this->sent;
     }
 
-    public function setSent(bool $sent): self
+    public function setSent(?bool $sent): void
     {
         $this->sent = $sent;
-
-        return $this;
     }
 
     public function getMediaId(): ?string
@@ -167,11 +177,9 @@ class MassTask implements \Stringable
         return $this->mediaId;
     }
 
-    public function setMediaId(?string $mediaId): self
+    public function setMediaId(?string $mediaId): void
     {
         $this->mediaId = $mediaId;
-
-        return $this;
     }
 
     public function getMsgTaskId(): ?string
@@ -179,11 +187,9 @@ class MassTask implements \Stringable
         return $this->msgTaskId;
     }
 
-    public function setMsgTaskId(?string $msgTaskId): self
+    public function setMsgTaskId(?string $msgTaskId): void
     {
         $this->msgTaskId = $msgTaskId;
-
-        return $this;
     }
 
     public function getMsgDataId(): ?string
@@ -191,11 +197,9 @@ class MassTask implements \Stringable
         return $this->msgDataId;
     }
 
-    public function setMsgDataId(?string $msgDataId): self
+    public function setMsgDataId(?string $msgDataId): void
     {
         $this->msgDataId = $msgDataId;
-
-        return $this;
     }
 
     public function __toString(): string
@@ -203,6 +207,9 @@ class MassTask implements \Stringable
         return $this->msgTaskId ?? 'New MassTask';
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function formatMessage(): array
     {
         if (MassType::TEXT === $this->getType()) {

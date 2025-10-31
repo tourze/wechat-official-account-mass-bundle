@@ -2,87 +2,44 @@
 
 namespace WechatOfficialAccountMassBundle\Command;
 
-use Carbon\CarbonImmutable;
-use Doctrine\ORM\EntityManagerInterface;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Tourze\Symfony\CronJob\Attribute\AsCronTask;
-use WechatOfficialAccountBundle\Service\OfficialAccountClient;
-use WechatOfficialAccountMassBundle\Entity\MassTask;
-use WechatOfficialAccountMassBundle\Repository\MassTaskRepository;
-use WechatOfficialAccountMassBundle\Request\SendByOpenIdRequest;
-use WechatOfficialAccountMassBundle\Request\SendByTagRequest;
-use WechatOfficialAccountMassBundle\Request\SendToAllRequest;
+use WechatOfficialAccountMassBundle\Service\MassTaskService;
 
 #[AsCronTask(expression: '* * * * *')]
 #[AsCommand(name: self::NAME, description: '公众号群发')]
 class SendMassCommand extends Command
 {
     public const NAME = 'wechat:send-mass';
+
     public function __construct(
-        private readonly LoggerInterface $logger,
-        private readonly MassTaskRepository $taskRepository,
-        private readonly OfficialAccountClient $client,
-        private readonly EntityManagerInterface $entityManager,
+        private readonly MassTaskService $massTaskService,
     ) {
         parent::__construct();
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        /** @var MassTask[] $models */
-        $models = $this->taskRepository->createQueryBuilder('a')
-            ->where('a.sent = false AND a.valid = true')
-            ->andWhere('a.sendTime <= :now')
-            ->setParameter('now', CarbonImmutable::now())
-            ->getQuery()
-            ->getResult();
+        $io = new SymfonyStyle($input, $output);
 
-        foreach ($models as $task) {
-            try {
-                $task->setSent(true);
-                $this->entityManager->persist($task);
-                $this->entityManager->flush();
-            } catch (\Throwable $exception) {
-                $this->logger->error('记录发送状态时发生错误', [
-                    'exception' => $exception,
-                    'task' => $task,
-                ]);
-                continue;
+        try {
+            $processedCount = $this->massTaskService->processPendingTasks();
+
+            if ($processedCount > 0) {
+                $io->success(sprintf('成功处理 %d 个群发任务', $processedCount));
+            } else {
+                $io->info('没有待处理的群发任务');
             }
 
-            $request = null;
-            // 有设置标签，就走标签逻辑
-            if ($task->getTagId() !== null) {
-                $request = new SendByTagRequest();
-                $request->setTagId($task->getTagId());
-            }
-            // 有设置用户列表
-            if (count($task->getOpenIds()) > 0) {
-                $request = new SendByOpenIdRequest();
-                $request->setToUsers($task->getOpenIds());
-            }
-            if ($request === null) {
-                $request = new SendToAllRequest();
-            }
+            return Command::SUCCESS;
+        } catch (\Throwable $exception) {
+            $io->error(sprintf('处理群发任务时发生错误: %s', $exception->getMessage()));
 
-            $request->setAccount($task->getAccount());
-            $request->setMessage($task->formatMessage());
-
-            $response = $this->client->request($request);
-            if (isset($response['msg_id'])) {
-                $task->setMsgTaskId($response['msg_id']);
-            }
-            if (isset($response['msg_data_id'])) {
-                $task->setMsgDataId($response['msg_data_id']);
-            }
-            $this->entityManager->persist($task);
-            $this->entityManager->flush();
+            return Command::FAILURE;
         }
-
-        return Command::SUCCESS;
     }
 }

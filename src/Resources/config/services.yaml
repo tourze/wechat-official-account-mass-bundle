@@ -7,7 +7,14 @@ services:
   # 如果确认要使用自动扫描、自动注册，建议尽可能将要扫描的目录路径收缩，不要设置那么大的范围
   WechatOfficialAccountMassBundle\Command\:
     resource: '../../Command/'
+  WechatOfficialAccountMassBundle\Controller\:
+    resource: '../../Controller/'
   WechatOfficialAccountMassBundle\Repository\:
     resource: '../../Repository/'
   WechatOfficialAccountMassBundle\Service\:
     resource: '../../Service/'
+
+  # EasyAdmin Menu Provider
+  WechatOfficialAccountMassBundle\Service\AdminMenu:
+    tags:
+      - { name: 'tourze.easyadmin_menu.menu_provider' }
