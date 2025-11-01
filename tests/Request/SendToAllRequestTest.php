@@ -2,7 +2,7 @@
 
 namespace WechatOfficialAccountMassBundle\Tests\Request;
 
-use HttpClientBundle\Tests\Request\RequestTestCase;
+use HttpClientBundle\Test\RequestTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use WechatOfficialAccountBundle\Entity\Account;
 use WechatOfficialAccountMassBundle\Request\SendToAllRequest;
