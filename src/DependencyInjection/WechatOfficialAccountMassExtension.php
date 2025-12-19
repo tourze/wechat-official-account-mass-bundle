@@ -4,7 +4,7 @@ namespace WechatOfficialAccountMassBundle\DependencyInjection;
 
 use Tourze\SymfonyDependencyServiceLoader\AutoExtension;
 
-class WechatOfficialAccountMassExtension extends AutoExtension
+final class WechatOfficialAccountMassExtension extends AutoExtension
 {
     protected function getConfigDir(): string
     {
